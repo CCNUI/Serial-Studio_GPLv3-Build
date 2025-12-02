@@ -368,6 +368,9 @@ jobs:
         $OutputDir = "${{github.workspace}}\Qt-${{env.QT_VERSION_WINDOWS}}-${{runner.os}}-x64"
         Write-Host "Installing Qt ${{env.QT_VERSION_WINDOWS}}..."
         
+        # 修改：删除了 qtsvg，保留了 qtgraphs qtserialbus qtwebsockets
+        aqt install-qt windows desktop ${{env.QT_VERSION_WINDOWS}} win64_msvc2022_64 --outputdir "$OutputDir" -m qtcharts qtserialport qtmultimedia qtconnectivity qtimageformats qtgraphs qtserialbus qtwebsockets
+        
         # 关键修改：在 -m 后面增加了 qtgraphs qtsvg qtserialbus qtwebsockets
         aqt install-qt windows desktop ${{env.QT_VERSION_WINDOWS}} win64_msvc2022_64 --outputdir "$OutputDir" -m qtcharts qtserialport qtmultimedia qtconnectivity qtimageformats qtgraphs qtsvg qtserialbus qtwebsockets
     - name: '⚙️ Save Qt Cache'
