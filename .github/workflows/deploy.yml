@@ -359,18 +359,22 @@ jobs:
           ${{env.USERPROFILE}}/.qt-license
         key: qt-${{runner.os}}-${{env.QT_VERSION_WINDOWS}}-x64-msvc2022_64
 
-    - name: '⚙️ Install Qt'
+    - name: '⚙️ Install Qt (via aqtinstall)'
       shell: pwsh
       if: env.INSTALL_QT_WINDOWS == 'true'
       env:
         QT_VERSION: ${{env.QT_VERSION_WINDOWS}}
-        QT_ARCH: x64
-        QT_USERNAME: ${{secrets.QT_USERNAME}}
-        QT_PASSWORD: ${{secrets.QT_PASSWORD}}
-        QT_OUTPUT_DIR: ${{github.workspace}}/Qt-${{env.QT_VERSION_WINDOWS}}-${{runner.os}}-x64
+        QT_OUTPUT_DIR: ${{github.workspace}}/Qt-${{env.QT_VERSION_WINDOWS}}-${{runner.os}}-x64-msvc2022_64
       run: |
-        ./scripts/install-qt.ps1
-
+        # 1. 安装 aqtinstall 工具
+        pip install aqtinstall
+        
+        # 2. 计算缓存路径 (与原脚本保持一致，以便后续步骤能找到)
+        $OutputDir = "${{github.workspace}}\Qt-${{env.QT_VERSION_WINDOWS}}-${{runner.os}}-x64"
+        
+        # 3. 使用 aqt 下载并安装 Qt (静默安装，无需交互)
+        Write-Host "Installing Qt ${{env.QT_VERSION_WINDOWS}} to $OutputDir..."
+        aqt install-qt windows desktop ${{env.QT_VERSION_WINDOWS}} win64_msvc2022_64 --outputdir "$OutputDir" -m qtcharts qtserialport qtmultimedia qtconnectivity qtimageformats
     - name: '⚙️ Save Qt Cache'
       if: env.INSTALL_QT_WINDOWS == 'true'
       uses: actions/cache/save@v3
